@@ -17,7 +17,7 @@ const register=(req,res)=>{
         password:hashpassword,
     };
     arr.push(temp);
-    const token=jwt.sign({email:details.email},secretkey,{expiresIn:"30s"});
+    const token=jwt.sign({email:details.email},secretkey,{expiresIn:"2m"});
     res.send({msg:'user is registered',result:arr, token});
     console.log(arr)
 };
@@ -28,7 +28,12 @@ const login=async(req,res)=>{
     if(!find){
         return res.statusCode(200).send({msg:"user not registerd"});
     }
-    const token=jwt.sign({email:details.email},secretkey);
+    const validate = await bcrypt.compare(details.password, find.password)
+    if(!validate){
+        return response.status(401).send({msg : 'password is wrong'})
+    }
+   
+    const token=jwt.sign({email:details.email},secretkey,{expiresIn:'5m'});
     return res.send({msg:'user is loged in successfully',token:token});
    
 }
